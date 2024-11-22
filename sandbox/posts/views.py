@@ -3,8 +3,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.http import HttpResponseBadRequest, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.template.loader import render_to_string
 from datetime import timedelta
 from django.db.models import Count
 from .models import Post
@@ -63,14 +65,13 @@ def home_view(request):
             recent_post_count=Count('posts', filter=Q(posts__created_at__gte=time_threshold))
         )
         .filter(recent_post_count__gt=0)
-        .order_by('-recent_post_count')[:10]
+        .order_by('-recent_post_count')[:5]
     )
 
     # Handle search query
     query = request.GET.get('q', '')
     user_results = []
     post_results = []
-    comment_results = []
 
     if query:
         # Search for users
