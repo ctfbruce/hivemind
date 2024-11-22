@@ -15,6 +15,7 @@ from hashtags.models import Hashtag
 from comments.models import Comment  # Ensure Comment model is imported
 from hashtags.utils import extract_hashtags  # If using this function
 import random
+from .recommendations import recommend_posts_hybrid
 
 @login_required
 def home_view(request):
@@ -88,6 +89,11 @@ def home_view(request):
             Q(author__username__icontains=query)
         ).select_related('author').prefetch_related('hashtags', 'comments')
 
+
+    #fetch recommended posts
+    recommended_posts = recommend_posts_hybrid(request.user, 10)
+
+
     context = {
         'form': form,
         'following_posts': following_posts,
@@ -96,6 +102,7 @@ def home_view(request):
         'query': query,
         'user_results': user_results,
         'post_results': post_results,
+        "recommended_posts":recommended_posts,
     }
     return render(request, 'home.html', context)
 

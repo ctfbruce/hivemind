@@ -26,13 +26,16 @@
                 {% include 'posts/partials/new_post_form.html' %}
             </div>
 
-            <!-- Tabs for Following, Trending, and Discover -->
+            <!-- Tabs for Following, Trending, For You, and Discover -->
             <ul class="nav nav-tabs mb-3" id="feedTabs" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link {% if not query %}active{% endif %}" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected="{% if not query %}true{% else %}false{% endif %}">Following</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="trending-tab" data-toggle="tab" href="#trending" role="tab" aria-controls="trending" aria-selected="false">Trending</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="for-you-tab" data-toggle="tab" href="#for-you" role="tab" aria-controls="for-you" aria-selected="false">For You</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if query %}active{% endif %}" id="discover-tab" data-toggle="tab" href="#discover" role="tab" aria-controls="discover" aria-selected="{% if query %}true{% else %}false{% endif %}">Discover</a>
@@ -59,6 +62,17 @@
                         {% endfor %}
                     {% else %}
                         <p>No trending posts at the moment.</p>
+                    {% endif %}
+                </div>
+
+                <!-- For You Tab Pane -->
+                <div class="tab-pane fade" id="for-you" role="tabpanel" aria-labelledby="for-you-tab">
+                    {% if recommended_posts %}
+                        {% for post in recommended_posts %}
+                            {% include 'posts/partials/post_card.html' with post=post %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No recommended posts at the moment. Try liking some content or following users.</p>
                     {% endif %}
                 </div>
 
