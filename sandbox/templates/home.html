@@ -2,54 +2,64 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load hashtags_extras %}
 
 {% block content %}
 <div class="container mt-4">
+    <div class="row">
+        <!-- Left Sidebar -->
+        <aside class="col-md-3">
+            {% include 'hashtags/partials/trending_tags.html' %}
+        </aside>
 
-    <!-- '+' Icon to trigger new post form -->
-    <div class="text-right mb-3">
-        <button id="new-post-button" class="btn btn-primary btn-circle">
-            <i class="fas fa-plus"></i>
-        </button>
-    </div>
+        <!-- Main Content -->
+        <main class="col-md-9">
+            <!-- '+' Icon to trigger new post form -->
+            <div class="text-right mb-3">
+                <button id="new-post-button" class="btn btn-primary btn-circle">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
 
-    <!-- New Post Form (Hidden by default) -->
-    <div id="new-post-form-container" style="display: none;">
-        {% include 'posts/partials/new_post_form.html' %}
-    </div>
+            <!-- New Post Form (Hidden by default) -->
+            <div id="new-post-form-container" style="display: none;">
+                {% include 'posts/partials/new_post_form.html' %}
+            </div>
 
-    <!-- Tabs for Trending and Following -->
-    <ul class="nav nav-tabs mb-3" id="feedTabs" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected="true">Following</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="trending-tab" data-toggle="tab" href="#trending" role="tab" aria-controls="trending" aria-selected="false">Trending</a>
-        </li>
-    </ul>
+            <!-- Tabs for Trending and Following -->
+            <ul class="nav nav-tabs mb-3" id="feedTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected="true">Following</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="trending-tab" data-toggle="tab" href="#trending" role="tab" aria-controls="trending" aria-selected="false">Trending</a>
+                </li>
+            </ul>
 
-    <div class="tab-content" id="feedTabsContent">
-        <!-- Following Tab Pane -->
-        <div class="tab-pane fade show active" id="following" role="tabpanel">
-            {% if following_posts %}
-                {% for post in following_posts %}
-                    {% include 'posts/partials/post_card.html' with post=post %}
-                {% endfor %}
-            {% else %}
-                <p>No posts to show. Follow some users to see their posts here.</p>
-            {% endif %}
-        </div>
+            <div class="tab-content" id="feedTabsContent">
+                <!-- Following Tab Pane -->
+                <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab">
+                    {% if following_posts %}
+                        {% for post in following_posts %}
+                            {% include 'posts/partials/post_card.html' with post=post %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No posts to show. Follow some users to see their posts here.</p>
+                    {% endif %}
+                </div>
 
-        <!-- Trending Tab Pane -->
-        <div class="tab-pane fade" id="trending" role="tabpanel">
-            {% if trending_posts %}
-                {% for post in trending_posts %}
-                    {% include 'posts/partials/post_card.html' with post=post %}
-                {% endfor %}
-            {% else %}
-                <p>No trending posts at the moment.</p>
-            {% endif %}
-        </div>
+                <!-- Trending Tab Pane -->
+                <div class="tab-pane fade" id="trending" role="tabpanel" aria-labelledby="trending-tab">
+                    {% if trending_posts %}
+                        {% for post in trending_posts %}
+                            {% include 'posts/partials/post_card.html' with post=post %}
+                        {% endfor %}
+                    {% else %}
+                        <p>No trending posts at the moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
     </div>
 </div>
 {% endblock %}
