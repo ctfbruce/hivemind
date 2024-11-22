@@ -1,0 +1,21 @@
+<!-- users/templates/users/profile.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h2>{{ profile_user.username }}</h2>
+            <p>{{ profile.bio }}</p>
+            <p>{{ profile.followers.count }} Followers | {{ profile.following.count }} Following</p>
+            {% if user != profile_user %}
+                {% if is_following %}
+                    <a href="{% url 'unfollow' profile_user.username %}" class="btn btn-secondary">Unfollow</a>
+                {% else %}
+                    <a href="{% url 'follow' profile_user.username %}" class="btn btn-primary">Follow</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
