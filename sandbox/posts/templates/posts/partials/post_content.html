@@ -1,11 +1,13 @@
-{% load humanize %}
 <!-- posts/templates/posts/partials/post_content.html -->
+{% load humanize %}
+{% load hashtags_extras %}
+
 <h5>
     <a href="{% url 'profile' post.author.username %}">
         {{ post.author.username }}
     </a>
 </h5>
-<p>{{ post.content }}</p>
+<p>{{ post.content|link_hashtags|safe }}</p>
 <p class="text-muted">
     <small>{{ post.created_at|naturaltime }}</small>
 </p>

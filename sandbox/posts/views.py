@@ -5,6 +5,7 @@ from .models import Post
 from .forms import PostForm
 from django.contrib.auth.models import User
 import random
+from hashtags.utils import extract_hashtags
 
 @login_required
 def home_view(request):
@@ -15,6 +16,8 @@ def home_view(request):
             new_post = form.save(commit=False)
             new_post.author = request.user
             new_post.save()
+            hashtags = extract_hashtags(new_post.content)
+            new_post.hashtags.set(hashtags)
             return redirect('home')
     else:
         form = PostForm()
@@ -26,7 +29,7 @@ def home_view(request):
     all_users = User.objects.exclude(id=request.user.id)
     random_users = all_users.order_by('?')[:10]  # Randomly select 10 users
     trending_posts = Post.objects.filter(author__in=random_users).order_by('-created_at')[:20]
-
+    
     context = {
         'form': form,
         'following_posts': following_posts,

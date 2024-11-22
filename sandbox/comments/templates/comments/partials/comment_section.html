@@ -1,10 +1,12 @@
-{% load humanize %}
 <!-- comments/templates/comments/partials/comment_section.html -->
+{% load humanize %}
+{% load hashtags_extras %}
+
 <div class="comments">
     {% if post.comments.exists %}
         {% for comment in post.comments.all %}
             <div class="comment mb-2">
-                <strong>{{ comment.author.username }}</strong>: {{ comment.content }}
+                <strong>{{ comment.author.username }}</strong>: {{ comment.content|link_hashtags }}
                 <p class="text-muted">
                     <small>{{ comment.created_at|naturaltime }}</small>
                 </p>

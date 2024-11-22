@@ -25,6 +25,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('', include('posts.urls')),
     path('comments/', include('comments.urls', namespace='comments')),
+    path('hashtags/', include('hashtags.urls', namespace='hashtags')),
 
     ]
 if settings.DEBUG:

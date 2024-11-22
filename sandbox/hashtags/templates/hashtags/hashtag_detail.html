@@ -1,0 +1,17 @@
+<!-- hashtags/templates/hashtags/hashtag_detail.html -->
+{% extends 'base.html' %}
+{% load humanize %}
+{% load hashtags_extras %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>#{{ hashtag.name }}</h2>
+    {% if posts %}
+        {% for post in posts %}
+            {% include 'posts/partials/post_card.html' %}
+        {% endfor %}
+    {% else %}
+        <p>No posts found for this hashtag.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "posts",
     "comments",
     "timeline",
+    "hashtags",
     "django.contrib.humanize",
 ]
 
