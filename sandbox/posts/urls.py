@@ -5,4 +5,5 @@ from . import views
 
 urlpatterns = [
     path('', views.home_view, name='home'),
+    path('like/<int:post_id>/', views.like_post, name='like_post'),
 ]

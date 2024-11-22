@@ -1,6 +1,15 @@
+<!-- posts/templates/posts/partials/post_card.html -->
 <div class="card mb-3">
     <div class="card-body">
         {% include 'posts/partials/post_content.html' %}
+
+        <!-- Like Button and Like Count -->
+        <div class="d-flex justify-content-between align-items-center">
+            <div id="like-button-{{ post.id }}">
+                {% include 'posts/partials/like_button.html' %}
+            </div>
+        </div>
+
         {% include 'comments/partials/comment_section.html' %}
         {% include 'comments/partials/comment_box.html' %}
     </div>

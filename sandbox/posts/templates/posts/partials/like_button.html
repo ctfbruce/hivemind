@@ -1,0 +1,16 @@
+<!-- posts/templates/posts/partials/like_button.html -->
+{% if user.is_authenticated %}
+    <form id="like-form-{{ post.id }}" hx-post="{% url 'like_post' post.id %}" hx-target="#like-button-{{ post.id }}" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm {% if user in post.likes.all %}btn-outline-danger{% else %}btn-outline-primary{% endif %}">
+            {% if user in post.likes.all %}
+                <i class="fas fa-heart"></i> Unlike
+            {% else %}
+                <i class="far fa-heart"></i> Like
+            {% endif %}
+        </button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Login</a> to like this post.</p>
+{% endif %}
+<span>{{ post.total_likes }} {{ post.total_likes|pluralize:"Like,Likes" }}</span>

@@ -1,7 +1,9 @@
 # posts/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.template.loader import render_to_string
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth.models import User
@@ -71,3 +73,28 @@ def home_view(request):
         'trending_hashtags': trending_hashtags,
     }
     return render(request, 'home.html', context)
+
+@login_required
+def like_post(request, post_id):
+    """Allow a user to like or unlike a post."""
+    post = get_object_or_404(Post, id=post_id)
+    user = request.user
+
+    if request.method == 'POST':
+        if user in post.likes.all():
+            # User has already liked this post; remove the like (unlike)
+            post.likes.remove(user)
+        else:
+            # Add a like to the post
+            post.likes.add(user)
+
+        if request.headers.get('HX-Request'):
+            # If the request is an htmx request, return the updated like button partial
+            context = {'post': post, 'user': user}
+            html = render_to_string('posts/partials/like_button.html', context, request=request)
+            return HttpResponse(html)
+        else:
+            # If not an htmx request, redirect back
+            return redirect('home')
+    else:
+        return HttpResponseBadRequest('Invalid request method.')
