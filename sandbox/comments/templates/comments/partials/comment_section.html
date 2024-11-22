@@ -1,0 +1,16 @@
+{% load humanize %}
+<!-- comments/templates/comments/partials/comment_section.html -->
+<div class="comments">
+    {% if post.comments.exists %}
+        {% for comment in post.comments.all %}
+            <div class="comment mb-2">
+                <strong>{{ comment.author.username }}</strong>: {{ comment.content }}
+                <p class="text-muted">
+                    <small>{{ comment.created_at|naturaltime }}</small>
+                </p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No comments yet.</p>
+    {% endif %}
+</div>

@@ -1,0 +1,17 @@
+<!-- comments/templates/comments/partials/comment_box.html -->
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'comments:add_comment' post.id %}">
+        {% csrf_token %}
+        <div class="form-group mb-2">
+            <textarea name="content" rows="2" class="form-control"
+                      placeholder="Write a comment..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary">
+            Comment
+        </button>
+    </form>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> to comment.</p>
+{% endif %}
+
+
