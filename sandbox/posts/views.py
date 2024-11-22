@@ -1,23 +1,23 @@
 # posts/views.py
 
-from django.shortcuts import render, redirect, get_object_or_404, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.template.loader import render_to_string
+from django.db.models import Q
+from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
-from django.contrib.auth.models import User
-from django.db.models import Count, Q
+from django.db.models import Count
 from .models import Post
 from .forms import PostForm
 from hashtags.models import Hashtag
-from hashtags.utils import extract_hashtags  # Make sure this function is defined
-from django.db.models.functions import Coalesce
+from comments.models import Comment  # Ensure Comment model is imported
+from hashtags.utils import extract_hashtags  # If using this function
 import random
 
 @login_required
 def home_view(request):
-    """Display the home feed with 'Following' and 'Trending' tabs, and trending hashtags."""
+    """Display the home feed with 'Following', 'Trending', and 'Discover' tabs."""
+    # Handle new post submission
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
@@ -34,11 +34,11 @@ def home_view(request):
     # Define time threshold for trending hashtags
     time_threshold = timezone.now() - timedelta(hours=24)
 
-    # Following posts
+    # Fetch 'Following' posts
     following_profiles = request.user.profile.following.all()
     following_posts = Post.objects.filter(author__profile__in=following_profiles)
 
-    # Trending posts (random posts from other users)
+    # Fetch 'Trending' posts (random posts from other users)
     all_users = User.objects.exclude(id=request.user.id)
     random_user_ids = all_users.values_list('id', flat=True)
     random_user_ids = list(random_user_ids)
@@ -57,7 +57,7 @@ def home_view(request):
     following_posts = following_posts.select_related(*select_fields).prefetch_related(*prefetch_fields).order_by('-created_at')
     trending_posts = trending_posts.select_related(*select_fields).prefetch_related(*prefetch_fields).order_by('-created_at')[:20]
 
-    # Trending hashtags in the last 24 hours
+    # Fetch trending hashtags
     trending_hashtags = (
         Hashtag.objects.annotate(
             recent_post_count=Count('posts', filter=Q(posts__created_at__gte=time_threshold))
@@ -66,13 +66,38 @@ def home_view(request):
         .order_by('-recent_post_count')[:10]
     )
 
+    # Handle search query
+    query = request.GET.get('q', '')
+    user_results = []
+    post_results = []
+    comment_results = []
+
+    if query:
+        # Search for users
+        user_results = User.objects.filter(
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query) |
+            Q(profile__bio__icontains=query)
+        )
+
+        # Search for posts
+        post_results = Post.objects.filter(
+            Q(content__icontains=query) |
+            Q(author__username__icontains=query)
+        ).select_related('author').prefetch_related('hashtags', 'comments')
+
     context = {
         'form': form,
         'following_posts': following_posts,
         'trending_posts': trending_posts,
         'trending_hashtags': trending_hashtags,
+        'query': query,
+        'user_results': user_results,
+        'post_results': post_results,
     }
     return render(request, 'home.html', context)
+
 
 @login_required
 def like_post(request, post_id):

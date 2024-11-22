@@ -8,7 +8,7 @@
 <div class="container mt-4">
     <div class="row">
         <!-- Left Sidebar -->
-        <aside class="col-md-3">
+        <aside class="col-md-3 sidebar">
             {% include 'hashtags/partials/trending_tags.html' %}
         </aside>
 
@@ -26,19 +26,22 @@
                 {% include 'posts/partials/new_post_form.html' %}
             </div>
 
-            <!-- Tabs for Trending and Following -->
+            <!-- Tabs for Following, Trending, and Discover -->
             <ul class="nav nav-tabs mb-3" id="feedTabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected="true">Following</a>
+                    <a class="nav-link {% if not query %}active{% endif %}" id="following-tab" data-toggle="tab" href="#following" role="tab" aria-controls="following" aria-selected="{% if not query %}true{% else %}false{% endif %}">Following</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="trending-tab" data-toggle="tab" href="#trending" role="tab" aria-controls="trending" aria-selected="false">Trending</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if query %}active{% endif %}" id="discover-tab" data-toggle="tab" href="#discover" role="tab" aria-controls="discover" aria-selected="{% if query %}true{% else %}false{% endif %}">Discover</a>
                 </li>
             </ul>
 
             <div class="tab-content" id="feedTabsContent">
                 <!-- Following Tab Pane -->
-                <div class="tab-pane fade show active" id="following" role="tabpanel" aria-labelledby="following-tab">
+                <div class="tab-pane fade {% if not query %}show active{% endif %}" id="following" role="tabpanel" aria-labelledby="following-tab">
                     {% if following_posts %}
                         {% for post in following_posts %}
                             {% include 'posts/partials/post_card.html' with post=post %}
@@ -56,6 +59,57 @@
                         {% endfor %}
                     {% else %}
                         <p>No trending posts at the moment.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Discover Tab Pane -->
+                <div class="tab-pane fade {% if query %}show active{% endif %}" id="discover" role="tabpanel" aria-labelledby="discover-tab">
+                    <!-- Search Bar -->
+                    <form method="GET" action="" class="form-inline mb-3">
+                        <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search" aria-label="Search" value="{{ request.GET.q }}">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
+
+                    <!-- Search Results -->
+                    {% if query %}
+                        <h5>Search Results for "{{ query }}"</h5>
+
+                        <!-- User Results -->
+                        <h6 class="mt-4">Users</h6>
+                        {% if user_results %}
+                            {% for user in user_results %}
+                                <div class="media mb-3">
+                                    <img src="{{ user.profile.avatar.url }}" class="mr-3 rounded-circle" alt="{{ user.username }}" width="50" height="50">
+                                    <div class="media-body">
+                                        <h5 class="mt-0">
+                                            <a href="{% url 'profile' user.username %}">{{ user.username }}</a>
+                                        </h5>
+                                        <p>{{ user.profile.bio }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>No users found.</p>
+                        {% endif %}
+
+                        <!-- Post Results -->
+                        <h6 class="mt-4">Posts</h6>
+                        {% if post_results %}
+                            {% for post in post_results %}
+                                {% include 'posts/partials/post_card.html' with post=post %}
+                            {% endfor %}
+                        {% else %}
+                            <p>No posts found.</p>
+                        {% endif %}
+                    {% else %}
+                        <!-- Default Discover Content (same as Trending) -->
+                        {% if trending_posts %}
+                            {% for post in trending_posts %}
+                                {% include 'posts/partials/post_card.html' with post=post %}
+                            {% endfor %}
+                        {% else %}
+                            <p>No posts to display.</p>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
