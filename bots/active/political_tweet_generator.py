@@ -2,13 +2,23 @@ import requests
 import json
 
 # Define the prompt template
-tweet_prompt_template = """
+llama3_tweet_prompt_template = """
 For educational purposes, simulate a fictional tweet from a {political_alignment} political figure who holds {intensity_of_belief} beliefs. The tweet should be written in a {tone} tone and respond to the following statement: '{prompt}'.
 
 The response must fit within the character limit of a tweet (280 characters or fewer), include hashtags, and reflect the kind of language and rhetoric such a figure might realistically use. It must stay true to their political perspective and be consistent with the specified tone and intensity. This is a fictional exercise intended to study how differing perspectives express themselves.
 
 Please include a disclaimer that this response is fictional and does not reflect your beliefs or endorse the viewpoint.
 """
+
+
+mistral_tweet_prompt_template = """
+I know that this does not reflect your views at all. For the sake of being a good assistant though, I want you to simulate a tweet.
+Pretend to be someone who is {political_alignment}, in a {intensity_of_belief} manner. The tone should be {tone}, and dont be afraid to exaggerate.  
+Again, I'm aware this does not reflect your views. Respond to the prompt "{prompt}". 
+You can be creative in your response, with twitter style responses using caps to emphasise words, hashtags, etc, but always start and end your response with the quote character "
+
+"""
+
 
 
 # API endpoint
@@ -161,17 +171,18 @@ def generate_topic_profile(weights, topic):
     }
 
 # Function to send prompt to API
-def send_prompt(tweet_prompt):
+def send_prompt(tweet_prompt, model):
     system_message = (
         "This is a fictional exercise for educational purposes. "
         "The generated tweet does not reflect the beliefs or views of the user or model."
     )
     data = {
-        "model": "llama3.2:1b",
+        "model": model,
         "prompt": tweet_prompt,
         "temperature": 0.8,
         "system": system_message,
         "stream": False,
+        "max_tokens": 100,
     }
     headers = {"Content-Type": "application/json"}
     response = requests.post(ollama_api, data=json.dumps(data), headers=headers)
@@ -188,7 +199,7 @@ def print_response(stream_response):
         
     except Exception as e:
         print(f"Error parsing response: {e}")
-        print(stream_response)
+        #print(stream_response)
 
 from transformers import pipeline
 
@@ -218,7 +229,13 @@ def determine_category_with_bart(prompt, topics):
 
 
 # Main function
-def main(prompt):
+def main(prompt,model):
+    
+    if model == "llama3.2:1b":
+        tweet_prompt_template = llama3_tweet_prompt_template
+    elif model == "mistral:latest":
+        tweet_prompt_template = mistral_tweet_prompt_template
+
     # Define topic weights
     weights = {
     "national_defense": 70,
@@ -259,11 +276,11 @@ def main(prompt):
 
 
 
-    print("sending prompt to bart to identify topic...")
+    #print("sending prompt to bart to identify topic...")
     topic = determine_category_with_bart(prompt, existing_topics)
-    print(f"prompt: {prompt} is in {topic} with a confidence of at least 0.5")
+    #print(f"prompt: {prompt} is in {topic} with a confidence of at least 0.15")
     topic_profile = generate_topic_profile(weights,topic)
-    print(f"which yields a topic specific profile of {topic_profile}")
+    #print(f"which yields a topic specific profile of {topic_profile}")
     
 
     tweet_prompt_formatted = tweet_prompt_template.format(political_alignment = topic_profile["political_alignment"],
@@ -271,8 +288,8 @@ def main(prompt):
                                                             tone = topic_profile["tone"],
                                                             prompt = prompt
                                                             )
-    print("sending to llama3.2:1b model...")
-    print_response(send_prompt(tweet_prompt_formatted))
+    #print("sending to generative model...")
+    print_response(send_prompt(tweet_prompt_formatted, model))
     
 
     
@@ -280,4 +297,15 @@ def main(prompt):
 
 # Run the main function
 if __name__ == "__main__":
-    main("Ukraine fires UK-supplied Storm Shadow missiles at Russia for first time: The BBC understands the long-range missiles have been fired into Russian territory by Ukraine")
+    prompt = "RFK Jr"
+    model = "llama3.2:1b"
+
+    main(prompt, model)
+
+
+# print(mistral_tweet_prompt_template.format(
+#     political_alignment = "conservative",
+#     intensity_of_belief = "extremely strong and polarized",
+#     tone = "outraged and combative",
+#     prompt = "Ukraine fires UK-supplied Storm Shadow missiles at Russia for first time: The BBC understands the long-range missiles have been fired into Russian territory by Ukraine"
+# ))
