@@ -1,4 +1,5 @@
 import random
+import csv
 import numpy as np
 from datetime import datetime, timedelta
 from pymongo import MongoClient
@@ -26,7 +27,6 @@ def float_to_time(t):
 
 def generate_tweet_time(window):
     """Generate a random tweet time within a window based on its weight."""
-    # Probability of tweeting in this window
     if random.random() > window["weight"]:
         return None  # No tweet in this window
 
@@ -57,10 +57,6 @@ def schedule_tweets():
 
     # Iterate through each bot
     for bot in bots:
-        
-
-
-        
         bot_id = bot["_id"]
         bot_name = bot["name"]
         post_timing_weights = bot.get("post_timing_weights", {})
@@ -78,7 +74,6 @@ def schedule_tweets():
         for window in windows:
             tweet_time = generate_tweet_time(window)
             if tweet_time:
-        
                 tweet_schedule.append({
                     "bot_id": str(bot_id),
                     "time": tweet_time,
@@ -94,14 +89,20 @@ def schedule_tweets():
 
     return tweet_schedule
 
+def save_schedule_to_csv(schedule, filename):
+    """Save the generated schedule to a CSV file."""
+    with open(filename, mode="w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=["bot_id", "name", "post_type", "time"])
+        writer.writeheader()
+        writer.writerows(schedule)
+    print(f"Schedule saved to {filename}")
+
 def main():
     # Get today's tweet schedule
     schedule = schedule_tweets()
 
-    # Print schedule in chronological order
-    print("Today's Tweet Schedule:")
-    for entry in schedule:
-        print(f"Bot ID: {entry['bot_id']} - {entry['name']} - {entry['post_type']}- Time: {entry['time']}")
+    # Save schedule to CSV
+    save_schedule_to_csv(schedule, "daily_schedule.csv")
 
 if __name__ == "__main__":
     main()
