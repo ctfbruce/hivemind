@@ -57,24 +57,37 @@ def schedule_tweets():
 
     # Iterate through each bot
     for bot in bots:
+        
+
+
+        
         bot_id = bot["_id"]
         bot_name = bot["name"]
-        posting_weights = bot.get("posting_weights", {})
+        post_timing_weights = bot.get("post_timing_weights", {})
 
         # Define time windows and weights
         windows = [
-            {"start": "6:30", "end": "11:00", "weight": posting_weights.get("6:30-11:00", 0)},
-            {"start": "11:00", "end": "16:00", "weight": posting_weights.get("11:00-16:00", 0)},
-            {"start": "16:00", "end": "18:00", "weight": posting_weights.get("16:00-18:00", 0)},
-            {"start": "18:00", "end": "23:00", "weight": posting_weights.get("18:00-23:00", 0)},
-            {"start": "23:00", "end": "3:00", "weight": posting_weights.get("23:00-3:00", 0)},
+            {"start": "6:30", "end": "11:00", "weight": post_timing_weights.get("6:30-11:00", 0)},
+            {"start": "11:00", "end": "16:00", "weight": post_timing_weights.get("11:00-16:00", 0)},
+            {"start": "16:00", "end": "18:00", "weight": post_timing_weights.get("16:00-18:00", 0)},
+            {"start": "18:00", "end": "23:00", "weight": post_timing_weights.get("18:00-23:00", 0)},
+            {"start": "23:00", "end": "3:00", "weight": post_timing_weights.get("23:00-3:00", 0)},
         ]
 
         # Generate tweet times for all windows
         for window in windows:
             tweet_time = generate_tweet_time(window)
             if tweet_time:
-                tweet_schedule.append({"bot_id": str(bot_id), "time": tweet_time, "name":str(bot_name)})
+        
+                tweet_schedule.append({
+                    "bot_id": str(bot_id),
+                    "time": tweet_time,
+                    "name": str(bot_name),
+                    "post_type": random.choices(
+                        list(bot["post_type_weights"].keys()),
+                        list(bot["post_type_weights"].values())
+                    )[0]  # Extract the selected value from random.choices
+                })
 
     # Sort the tweet schedule by time
     tweet_schedule.sort(key=lambda x: datetime.strptime(x["time"], "%H:%M"))
@@ -88,7 +101,7 @@ def main():
     # Print schedule in chronological order
     print("Today's Tweet Schedule:")
     for entry in schedule:
-        print(f"Bot ID: {entry['bot_id']} - {entry['name']} - Time: {entry['time']}")
+        print(f"Bot ID: {entry['bot_id']} - {entry['name']} - {entry['post_type']}- Time: {entry['time']}")
 
 if __name__ == "__main__":
     main()

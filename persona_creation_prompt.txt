@@ -1,0 +1,155 @@
+Generate a structured JSON representation of a fictional persona. Only return the JSON object as the output, without any additional text or explanation. The JSON object should include:
+
+1. **Basic Metadata**:
+   - name: A realistic first and last name.
+   - age: An integer between 18 and 70.
+   - gender: Male, Female, or Non-Binary.
+   - country: A realistic country where the persona resides 
+   - city: A realistic city, in the country where the persona resides 
+   - profession: A realistic profession.
+   - hobbies: A list of 2–5 hobbies (e.g., "hiking", "painting", "gaming").
+   - background: A unique description of the persona’s history, values, and personality traits. This should align with their profession, hobbies, and worldview.
+
+2. **Political Weights**:
+   Assign a weight between 0 and 100 for each individual topic. The weights should logically align with the persona’s metadata and reflect a balance of liberal, centrist, and conservative personas across multiple outputs:
+
+   **Government & Law**:
+   - national_defense: **0 = Anti-war, pacifist; 100 = Pro-war, hawkish.**
+   - military: **0 = Opposes military spending; 100 = Supports high military spending.**
+   - law_enforcement: **0 = Abolish the police; 100 = Strong law enforcement.**
+   - gun_control: **0 = Strong gun control; 100 = Opposes gun control.**
+   - foreign_policy: **0 = Non-interventionist; 100 = Aggressive interventionist.**
+
+   **Social Issues**:
+   - immigration: **0 = Open borders advocate; 100 = Strict border control.**
+   - lgbtq: **0 = Advocate for LGBTQ rights; 100 = Opposes LGBTQ rights.**
+   - race: **0 = Diversity-promoting; 100 = Ethnocentric.**
+   - gender: **0 = Gender equality advocate; 100 = Supports rigid gender roles.**
+   - abortion: **0 = Pro-choice; 100 = Pro-life.**
+   - religion: **0 = Secularism advocate; 100 = Religious governance advocate.**
+   - civil_liberties: **0 = Individual freedoms over security; 100 = Security over freedoms.**
+
+   **Economics & Class**:
+   - economic_policy: **0 = Socialist; 100 = Laissez-faire capitalist.**
+   - income: **0 = High taxes on the wealthy; 100 = No taxes on the wealthy.**
+   - taxation: **0 = Strongly supports progressive taxation; 100 = Opposes taxation.**
+   - social_welfare: **0 = Universal welfare advocate; 100 = Opposes welfare programs.**
+   - corporations: **0 = Heavy regulation; 100 = Unregulated corporate freedom.**
+   - housing: **0 = Universal housing rights; 100 = Privatized housing market.**
+   - healthcare: **0 = Universal healthcare advocate; 100 = Fully privatized healthcare.**
+   - minimum_wage: **0 = Supports high minimum wage; 100 = Opposes minimum wage laws.**
+
+   **Cultural Topics**:
+   - nationalism: **0 = Globalist; 100 = Nationalist.**
+   - political_party: **0 = Strongly left-wing; 100 = Strongly right-wing.**
+   - media: **0 = Public-funded unbiased media; 100 = Partisan corporate media.**
+   - cancel_culture: **0 = Supports accountability via cancel culture; 100 = Opposes cancel culture.**
+   - free_speech: **0 = Limits hate speech; 100 = Absolute free speech advocate.**
+
+   **Technology & Environment**:
+   - education: **0 = Free and universal education advocate; 100 = Privatized education.**
+   - climate_change: **0 = Urgent climate action advocate; 100 = Climate change skeptic.**
+   - technology: **0 = Regulates AI/tech; 100 = Unregulated tech.**
+   - privacy: **0 = Privacy-focused; 100 = Surveillance-focused.**
+   - artificial_intelligence: **0 = Supports regulated AI; 100 = Unregulated AI.**
+   - renewable_energy: **0 = Fully renewable-focused; 100 = Fossil fuels advocate.**
+
+   **Global Issues**:
+   - global_trade: **0 = Open trade policies; 100 = Protectionist policies.**
+   - borders: **0 = Open borders advocate; 100 = Secured borders.**
+   - humanitarian_aid: **0 = Strongly supports humanitarian aid; 100 = Opposes humanitarian aid.**
+
+3. **Post Timing Weights**:
+   Define the likelihood of the persona posting on social media during the following time windows:
+   - 6:30-11:00: Morning.
+   - 11:00-16:00: Midday.
+   - 16:00-18:00: Afternoon.
+   - 18:00-23:00: Evening.
+   - 23:00-3:00: Night.  
+   Each window should have a probability between 0.0 and 1.0, summing to approximately 1.0. Posting weights should align with the persona’s lifestyle, daily routine, and profession.
+
+4. **Post Type Weights**:
+    Define the likelihood of the persona posting a specific type of content. The sum of all the weights should equal 1:
+    -Daily Life Updates
+    -Random shower-thoughts and opinions
+    -Sports content
+    -React to the news
+    -Random questions
+    -Inspirational content
+    -Memes or humorous content
+    -other/miscellaneous
+---
+
+### **Output Requirements**
+- Return only the JSON object as the output.
+- Ensure the political_weights logically align with the persona’s metadata and reflect natural variation.
+- The posting_weights should align with the persona's lifestyle and daily routine.
+
+---
+
+### Example Output
+json
+{
+  "name": "Sophia Vergara",
+  "age": 35,
+  "gender": "Female",
+  "country":"United States",
+  "city": "Portland",
+  "profession": "Environmental Scientist",
+  "hobbies": ["hiking", "gardening", "reading about renewable energy"],
+  "background": "Sophia is an environmental advocate who believes in sustainability and community engagement. She grew up in a progressive family and is passionate about climate action and renewable energy.",
+  "political_weights": {
+    "national_defense": 20,
+    "military": 30,
+    "law_enforcement": 40,
+    "gun_control": 20,
+    "foreign_policy": 35,
+    "immigration": 25,
+    "lgbtq": 10,
+    "race": 15,
+    "gender": 20,
+    "abortion": 15,
+    "religion": 20,
+    "civil_liberties": 25,
+    "economic_policy": 30,
+    "income": 25,
+    "taxation": 20,
+    "social_welfare": 15,
+    "corporations": 30,
+    "housing": 20,
+    "healthcare": 10,
+    "minimum_wage": 15,
+    "nationalism": 20,
+    "political_party": 25,
+    "media": 30,
+    "cancel_culture": 15,
+    "free_speech": 20,
+    "education": 10,
+    "climate_change": 5,
+    "technology": 15,
+    "privacy": 20,
+    "artificial_intelligence": 25,
+    "renewable_energy": 5,
+    "global_trade": 15,
+    "borders": 25,
+    "humanitarian_aid": 10
+  },
+  "post_timing_weights": {
+    "6:30-11:00": 0.1,
+    "11:00-16:00": 0.3,
+    "16:00-18:00": 0.2,
+    "18:00-23:00": 0.3,
+    "23:00-3:00": 0.1
+  },
+  "post_type_weights":{
+    "daily_life_updates":0.3
+    "shower_thoughts_and_opinions":0.1
+    "sports":0.05
+    -"news_reaction":0.1
+    -"random_questions":0.05
+    -"inspirational_content":0.05
+    -"memes_and_humour":0.3
+    -"other_miscellaneous":0.05
+
+  }
+} Bear in mind that LLMs tend to make more liberal personas and political weights, don't shy away from making a conservative persona, though don't let this closing comment sway you to make disproportionate amounts now
