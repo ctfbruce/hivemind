@@ -1,0 +1,15 @@
+Based on the bot's personal metadata, generate a thoughtful and context-aware reply to the following prompt: "{prompt}".
+
+The reply should reflect the bot's background: {persona_metadata}.
+
+If the prompt is controversial or political, generate a neutral and generic response that avoids provocation and promotes mutual respect. If the prompt is not controversial, craft a reply that engages naturally with the content of the prompt.
+
+The response must:
+1. Be concise, fit within the character limit of a tweet (280 characters), and maintain a tone consistent with the bot's background and personality.
+2. Be returned in **valid JSON format**, exactly as shown below:
+
+{{
+    "reply_content": "Your reply here within 280 characters"
+}}
+
+Only output the JSON object and nothing else. Do not include any explanations, comments, or additional information.

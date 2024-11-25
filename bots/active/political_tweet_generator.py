@@ -186,6 +186,7 @@ def send_prompt(tweet_prompt, model):
     }
     headers = {"Content-Type": "application/json"}
     response = requests.post(ollama_api, data=json.dumps(data), headers=headers)
+    print(tweet_prompt)
     return response.text
 
 # Function to parse and print response
@@ -198,6 +199,7 @@ def return_formatted_response(stream_response):
         
         
     except Exception as e:
+        print(response)
         print(f"Error parsing response: {e}")
         #print(stream_response)
 
@@ -229,12 +231,15 @@ def determine_category_with_bart(prompt, topics):
 
 
 # Main function
-def political_tweet(prompt, political_weights,model="mistral:latest"):
+def political_tweet(prompt, political_weights,model="mistral:latest", tweet_prompt_template = None):
     
-    if model == "llama3.2:1b":
-        tweet_prompt_template = llama3_tweet_prompt_template
-    elif model == "mistral:latest":
-        tweet_prompt_template = mistral_tweet_prompt_template
+    if tweet_prompt_template is None:
+        if model == "llama3.2:1b":
+            tweet_prompt_template = llama3_tweet_prompt_template
+        elif model == "mistral:latest":
+            tweet_prompt_template = mistral_tweet_prompt_template
+        else:
+            raise KeyError("No template was provided, and then no valid model was provided, so can't determine which template to use")
 
     # Define topic weights
     weights = political_weights

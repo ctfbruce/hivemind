@@ -13,7 +13,7 @@ COLLECTION_NAME = "bot_personas"
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 collection = db[COLLECTION_NAME]
-
+interaction_types = ["post", "comment", "like"]
 def time_to_float(t):
     """Convert time (HH:MM) to hours past midnight (as float)."""
     h, m = map(int, t.split(":"))
@@ -25,9 +25,14 @@ def float_to_time(t):
     m = int((t - h) * 60)
     return f"{h:02}:{m:02}"
 
-def generate_tweet_time(window):
-    """Generate a random tweet time within a window based on its weight."""
-    if random.random() > window["weight"]:
+def generate_interaction_time(window,type):
+
+    post_weight_multipliers = {
+        "post":1,
+        "comment":1.2,
+        "like":5,
+    }
+    if random.random() > window["weight"] * post_weight_multipliers[type]:
         return None  # No tweet in this window
 
     # Calculate window parameters
@@ -48,7 +53,7 @@ def generate_tweet_time(window):
     # Convert back to HH:MM format
     return float_to_time(tweet_time % 24)  # Handle overflow past midnight
 
-def schedule_tweets():
+def schedule_interaction():
     """Query all bots and generate their tweets for the day."""
     # Fetch all bots from the database
     bots = list(collection.find())
@@ -73,22 +78,24 @@ def schedule_tweets():
 
         # Generate tweet times for all windows
         for window in windows:
-            tweet_time = generate_tweet_time(window)
-            if tweet_time:
-                tweet_schedule.append({
-                    "bot_id": str(bot_id),
-                    "time": tweet_time,
-                    "name": str(bot_name),
-                    "post_type": random.choices(
-                        list(bot["post_type_weights"].keys()),
-                        list(bot["post_type_weights"].values())
-                    )[0]  # Extract the selected value from random.choices
-                })
+            for type in interaction_types:
+                tweet_time = generate_interaction_time(window,type)
+                if tweet_time:
+                    tweet_schedule.append({
+                        "bot_id": str(bot_id),
+                        "time": tweet_time,
+                        "name": str(bot_name),
+                        "post_type": random.choices(
+                            list(bot["post_type_weights"].keys()),
+                            list(bot["post_type_weights"].values())
+                        )[0]  if type == "post" else type
+                    })
 
     # Sort the tweet schedule by time
     tweet_schedule.sort(key=lambda x: datetime.strptime(x["time"], "%H:%M"))
 
     return tweet_schedule
+
 
 def save_schedule_to_csv(schedule, filename):
     """Save the generated schedule to a CSV file."""
@@ -99,10 +106,10 @@ def save_schedule_to_csv(schedule, filename):
     print(f"Schedule saved to {filename}")
 
 def main():
-    # Get today's tweet schedule
-    schedule = schedule_tweets()
 
-    # Save schedule to CSV
+    #Make tweet posting schedule
+    schedule = schedule_interaction()
+
     save_schedule_to_csv(schedule, "daily_schedule.csv")
 
 if __name__ == "__main__":

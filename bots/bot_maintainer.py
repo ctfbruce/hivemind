@@ -2,17 +2,17 @@ import csv
 import os
 import asyncio
 from datetime import datetime
-from passive.passive_tweet_generator import main as generate_tweet
-from site_interactions import post
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-
+from bots.passive.bot_actions.tweet import tweet
+from bots.passive.bot_actions.comment import fetch_comment_to_reply_to_and_comment
+from bots.passive.bot_actions.like import send_like_to_random_post
 
 # MongoDB Configuration
 MONGO_URI = "mongodb://localhost:27017/"
 DB_NAME = "bot_database"
 COLLECTION_NAME = "bot_personas"
-
+HOST = "http://localhost:8000/"
 # MongoDB Initialization
 client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
@@ -21,7 +21,7 @@ collection = db[COLLECTION_NAME]
 # CSV File Path
 DAILY_SCHEDULE_FILE = "daily_schedule.csv"
 
-async def process_tweets():
+async def process_interaction():
     """Continuously check and post tweets based on the schedule."""
     while True:
         now = datetime.now().strftime("%H:%M")
@@ -32,7 +32,7 @@ async def process_tweets():
             await asyncio.sleep(5)
             continue
 
-        tweet_processed = False  # Track if any tweets are processed in this loop
+        interaction_processed = False  # Track if any tweets are processed in this loop
         new_schedule = []
 
         # Read the schedule file
@@ -42,14 +42,14 @@ async def process_tweets():
 
         # Process tweets
         for row in rows:
-            tweet_time = row["time"]
+            interaction_time = row["time"]
             bot_id = row["bot_id"]
-            post_type = row["post_type"]
+            interaction_type = row["post_type"]
             name = row["name"]  # Optional for logging/debugging
 
             # Check if the tweet is due
-            if now >= tweet_time:
-                tweet_processed = True
+            if now >= interaction_time:
+                interaction_processed = True
 
                 # Fetch bot credentials
                 bot = collection.find_one({"_id": ObjectId(bot_id)})
@@ -60,25 +60,19 @@ async def process_tweets():
                 username = bot["basic_metadata"]["username"]
                 password = bot["password"]
 
-                # Generate the tweet content
-                try:
-                    print("\n post type is", post_type)
-                    content = generate_tweet(bot_id, post_type)
-                except Exception as e:
-                    print(f"{now} - Error generating tweet content for {name} ({bot_id}): {e}")
-                    continue
-
-                # Post the tweet
-                try:
-                    post(username, password, content)
-                    print(f"{now} - Tweet posted by {name} ({username}): {content}")
-                except Exception as e:
-                    print(f"{now} - Failed to post tweet for {name} ({username}). Error: {e}")
+                if interaction_type == "like":
+                    send_like_to_random_post(HOST, username,password)
+                elif interaction_type == "comment":
+                    fetch_comment_to_reply_to_and_comment(HOST, username,password, bot["basic_metadata"]["background"])
+                else:
+                    tweet(interaction_type, now, name, bot_id, username, password)
+                
+                
             else:
                 new_schedule.append(row)
 
         # Update the schedule file if any tweets were processed
-        if tweet_processed:
+        if interaction_processed:
             with open(DAILY_SCHEDULE_FILE, "w", newline="") as file:
                 writer = csv.DictWriter(file, fieldnames=["bot_id", "name", "post_type", "time"])
                 writer.writeheader()
@@ -88,7 +82,7 @@ async def process_tweets():
         await asyncio.sleep(5)
 
 def main():
-    asyncio.run(process_tweets())
+    asyncio.run(process_interaction())
 
 if __name__ == "__main__":
     main()

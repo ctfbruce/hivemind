@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-from news_scrapers.bbc_scraper import get_stories_from_topic
-from active.political_tweet_generator import political_tweet
+from bots.news_scrapers.bbc_scraper import get_stories_from_topic
+from bots.active.political_tweet_generator import political_tweet
 import random
 import requests
 import json
@@ -47,6 +47,7 @@ def parse_model_response(response_text):
         
         # Parse the JSON response
         parsed_response = json.loads(response_text)
+        
         return parsed_response
     except json.JSONDecodeError as e:
         print(f"Invalid JSON: {response_text}")
@@ -125,6 +126,19 @@ def generate_other(type):
     return send_prompt(prompt, "llama3.2:1b")
         
 
+def generate_comment(persona_metadata, prompt):
+    with open("passive/comment_template.txt","r") as comment_prompt_template:
+        
+
+        reply_content = send_prompt(comment_prompt_template.read().format(
+            persona_metadata=persona_metadata,
+            prompt = prompt
+            ), "llama3.2:1b")["reply_content"]
+        
+        return reply_content
+
+
+
 def main(bot_id, tweet_type):
     bot_id = ObjectId(bot_id)
     bot = collection.find_one({"_id": bot_id})
@@ -146,7 +160,6 @@ def main(bot_id, tweet_type):
         print("output from bot = tweet = ", result)
         return result
   
-    
 
 
 

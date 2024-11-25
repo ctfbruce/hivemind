@@ -53,7 +53,7 @@ def register_user(username, email, password):
             print(f"Failed to register. Status Code: {response.status_code}")
             print(response.text)
             
-def post(username, password, content):
+def post_to_site(username, password, content):
     """
     Log in and post content using CSRF tokens and session cookies.
     """
