@@ -4,7 +4,9 @@ from pymongo import MongoClient
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-
+import random
+import secrets
+import string
 
 load_dotenv()
 
@@ -18,12 +20,15 @@ client = MongoClient(MONGO_URI)
 db = client[DB_NAME]
 collection = db[COLLECTION_NAME]
 
-        
-        
-def create_credentials():
-    return {"password":"fakepass",
-            "username":"fakeuser"}
 
+
+def generate_password():
+    password_length = random.randint(12, 16)
+    characters = string.ascii_letters + string.digits + "!@#$%^&*()_-+=<>?"
+    password = ''.join(secrets.choice(characters) for _ in range(password_length))
+
+    return password
+        
 def create_persona():
     
     #load prompt
@@ -45,13 +50,6 @@ def create_persona():
 
     return completion.choices[0].message.content
     
-    #     # Add generated persona to MongoDB
-    # credentials = create_credentials()
-    # persona["credentials"] = credentials
-    # collection.insert_one(persona)
-    
-    # return persona
-
 
 def parse_api_response(response_content):
     # Remove code block markers (```json ... ```)
@@ -63,21 +61,29 @@ def parse_api_response(response_content):
 
 def main():
     raw_response = create_persona()
-    print("raw response", raw_response)
+    #print("raw response", raw_response)
     parsed_response = parse_api_response(raw_response)
     
-    print("parsed respose:", parsed_response)
+    #print("parsed respose:", parsed_response)
     
-    credentials = create_credentials()
-    parsed_response["credentials"] = credentials
-    collection.insert_one(parsed_response)
 
-    print(f"New persona {parsed_response['name']} inserted")
+    parsed_response["password"] = generate_password()
+    collection.insert_one(parsed_response)
+    print(f"New persona {parsed_response['basic_metadata']['name']} inserted")
+
+
+    from bots.site_interactions import register_user
+    
+    print("now registering . . .")
+    register_user(parsed_response["basic_metadata"]["username"], parsed_response["basic_metadata"]["username"]+"@gmail.com", parsed_response["password"])
+    print("registered!")
+    
+    
 if __name__ == "__main__":
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     if not OPENAI_API_KEY:
         raise ValueError("OpenAI API Key is not set. Please check your .env file.")
-    for i in range(4):
+    for i in range(1):
         main()
 
 

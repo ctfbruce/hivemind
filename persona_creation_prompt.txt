@@ -2,6 +2,7 @@ Generate a structured JSON representation of a fictional persona. Only return th
 
 1. **Basic Metadata**:
    - name: A realistic first and last name.
+   - username: A real looking but almost guaranteed unique username, ideally with some relevance to the persona
    - age: An integer between 18 and 70.
    - gender: Male, Female, or Non-Binary.
    - country: A realistic country where the persona resides 
