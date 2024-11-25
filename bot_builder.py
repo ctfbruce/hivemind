@@ -83,7 +83,7 @@ if __name__ == "__main__":
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     if not OPENAI_API_KEY:
         raise ValueError("OpenAI API Key is not set. Please check your .env file.")
-    for i in range(1):
+    for i in range(400):
         main()
 
 

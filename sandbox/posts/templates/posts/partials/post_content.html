@@ -7,7 +7,7 @@
         {{ post.author.username }}
     </a>
 </h5>
-<p>{{ post.content|link_hashtags|safe }}</p>
+<p>{{ post.content|safe|link_hashtags }}</p>
 <p class="text-muted">
     <small>{{ post.created_at|naturaltime }}</small>
 </p>

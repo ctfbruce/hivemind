@@ -2,20 +2,19 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponseBadRequest, HttpResponse
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.template.loader import render_to_string
 from datetime import timedelta
-from django.db.models import Count
 from .models import Post
 from .forms import PostForm
 from hashtags.models import Hashtag
-from comments.models import Comment  # Ensure Comment model is imported
-from hashtags.utils import extract_hashtags  # If using this function
-import random
+from comments.models import Comment
+from hashtags.utils import extract_hashtags
 from .recommendations import recommend_posts_hybrid
+from .utils import get_trending_posts  # Import the utility function
 
 @login_required
 def home_view(request):
@@ -34,20 +33,12 @@ def home_view(request):
     else:
         form = PostForm()
 
-    # Define time threshold for trending hashtags
-    time_threshold = timezone.now() - timedelta(hours=24)
-
     # Fetch 'Following' posts
     following_profiles = request.user.profile.following.all()
     following_posts = Post.objects.filter(author__profile__in=following_profiles)
 
-    # Fetch 'Trending' posts (random posts from other users)
-    all_users = User.objects.exclude(id=request.user.id)
-    random_user_ids = all_users.values_list('id', flat=True)
-    random_user_ids = list(random_user_ids)
-    random.shuffle(random_user_ids)
-    random_user_ids = random_user_ids[:10]
-    trending_posts = Post.objects.filter(author__id__in=random_user_ids)
+    # Fetch 'Trending' posts using the new utility function
+    trending_posts = get_trending_posts(10)
 
     # Optimize queries for posts
     prefetch_fields = [
@@ -58,9 +49,10 @@ def home_view(request):
     select_fields = ['author']
 
     following_posts = following_posts.select_related(*select_fields).prefetch_related(*prefetch_fields).order_by('-created_at')
-    trending_posts = trending_posts.select_related(*select_fields).prefetch_related(*prefetch_fields).order_by('-created_at')[:20]
+    trending_posts = trending_posts.select_related(*select_fields).prefetch_related(*prefetch_fields)
 
     # Fetch trending hashtags
+    time_threshold = timezone.now() - timedelta(hours=24)
     trending_hashtags = (
         Hashtag.objects.annotate(
             recent_post_count=Count('posts', filter=Q(posts__created_at__gte=time_threshold))
@@ -89,10 +81,8 @@ def home_view(request):
             Q(author__username__icontains=query)
         ).select_related('author').prefetch_related('hashtags', 'comments')
 
-
-    #fetch recommended posts
+    # Fetch recommended posts
     recommended_posts = recommend_posts_hybrid(request.user, 10)
-
 
     context = {
         'form': form,
@@ -102,11 +92,11 @@ def home_view(request):
         'query': query,
         'user_results': user_results,
         'post_results': post_results,
-        "recommended_posts":recommended_posts,
+        'recommended_posts': recommended_posts,
+        'page': 1,
+        'posts_per_page': 10,
     }
     return render(request, 'home.html', context)
-
-
 @login_required
 def like_post(request, post_id):
     """Allow a user to like or unlike a post."""
@@ -130,4 +120,33 @@ def like_post(request, post_id):
             # If not an htmx request, redirect back
             return redirect('home')
     else:
-        return HttpResponseBadRequest('Invalid request method.')
+        return HttpResponseBadRequest('Invalid request method.'), 
+
+
+@login_required
+def load_more_trending_posts(request):
+    print("load more trending has been called")
+    page = int(request.GET.get('page', 1))
+    posts_per_page = 10
+    offset = (page - 1) * posts_per_page
+    trending_posts = get_trending_posts(posts_per_page, offset=offset)
+    context = {
+        'trending_posts': trending_posts,
+        'page': page,
+        'posts_per_page': posts_per_page,
+    }
+    return render(request, 'posts/partials/trending_post.html', context)
+
+@login_required
+def load_more_recommended_posts(request):
+    print("load more recommended has been called")
+    page = int(request.GET.get('page', 1))
+    posts_per_page = 10
+    offset = (page - 1) * posts_per_page
+    recommended_posts = recommend_posts_hybrid(request.user, posts_per_page, offset=offset)
+    context = {
+        'recommended_posts': recommended_posts,
+        'page': page,
+        'posts_per_page': posts_per_page,
+    }
+    return render(request, 'posts/partials/recommended_post.html', context)

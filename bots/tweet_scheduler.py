@@ -58,7 +58,8 @@ def schedule_tweets():
     # Iterate through each bot
     for bot in bots:
         bot_id = bot["_id"]
-        bot_name = bot["name"]
+
+        bot_name = bot["basic_metadata"]["name"]
         post_timing_weights = bot.get("post_timing_weights", {})
 
         # Define time windows and weights

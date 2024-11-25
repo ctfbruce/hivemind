@@ -56,24 +56,48 @@
 
                 <!-- Trending Tab Pane -->
                 <div class="tab-pane fade" id="trending" role="tabpanel" aria-labelledby="trending-tab">
-                    {% if trending_posts %}
-                        {% for post in trending_posts %}
-                            {% include 'posts/partials/post_card.html' with post=post %}
-                        {% endfor %}
-                    {% else %}
-                        <p>No trending posts at the moment.</p>
-                    {% endif %}
+                    <div id="trending-posts-container">
+                        {% if trending_posts %}
+                            {% for post in trending_posts %}
+                                {% include 'posts/partials/post_card.html' with post=post %}
+                            {% endfor %}
+                            {% if trending_posts|length >= posts_per_page %}
+                                <div
+                                    id="load-more-trending-1"
+                                    hx-get="{% url 'load_more_trending_posts' %}?page=2"
+                                    hx-trigger="revealed"
+                                    hx-swap="afterend"
+                                    hx-target="#load-more-trending-1"
+                                    class="load-more-trigger"
+                                ></div>
+                            {% endif %}
+                        {% else %}
+                            <p>No trending posts at the moment.</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- For You Tab Pane -->
                 <div class="tab-pane fade" id="for-you" role="tabpanel" aria-labelledby="for-you-tab">
-                    {% if recommended_posts %}
-                        {% for post in recommended_posts %}
-                            {% include 'posts/partials/post_card.html' with post=post %}
-                        {% endfor %}
-                    {% else %}
-                        <p>No recommended posts at the moment. Try liking some content or following users.</p>
-                    {% endif %}
+                    <div id="recommended-posts-container">
+                        {% if recommended_posts %}
+                            {% for post in recommended_posts %}
+                                {% include 'posts/partials/post_card.html' with post=post %}
+                            {% endfor %}
+                            {% if recommended_posts|length >= posts_per_page %}
+                                <div
+                                    id="load-more-recommended-1"
+                                    hx-get="{% url 'load_more_recommended_posts' %}?page=2"
+                                    hx-trigger="revealed"
+                                    hx-swap="afterend"
+                                    hx-target="#load-more-recommended-1"
+                                    class="load-more-trigger"
+                                ></div>
+                            {% endif %}
+                        {% else %}
+                            <p>No recommended posts at the moment. Try liking some content or following users.</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Discover Tab Pane -->

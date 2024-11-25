@@ -1,0 +1,17 @@
+{% for post in trending_posts %}
+    {% include 'posts/partials/post_card.html' with post=post %}
+{% endfor %}
+
+{% if trending_posts|length >= posts_per_page %}
+    {% with next_page=page|add:1 %}
+        <div
+            id="load-more-trending-{{ next_page }}"
+            hx-get="{% url 'load_more_trending_posts' %}?page={{ next_page }}"
+            hx-trigger="intersect once"
+            hx-swap="afterend"
+            hx-target="#load-more-trending-{{ next_page }}"
+            class="load-more-trigger"
+            style="height: 1px; visibility: hidden;" 
+        ></div>
+    {% endwith %}
+{% endif %}

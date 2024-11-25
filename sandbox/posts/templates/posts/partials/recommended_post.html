@@ -1,0 +1,18 @@
+<!-- posts/partials/recommended_posts.html -->
+
+{% for post in recommended_posts %}
+    {% include 'posts/partials/post_card.html' with post=post %}
+{% endfor %}
+
+
+    {% with next_page=page|add:1 %}
+        <div
+            id="load-more-recommended-{{ next_page }}"
+            hx-get="{% url 'load_more_recommended_posts' %}?page={{ next_page }}"
+            hx-trigger="revealed"
+            hx-swap="afterend"
+            hx-target="#load-more-recommended-{{ page }}"
+            class="load-more-trigger"
+        ></div>
+    {% endwith %}
+

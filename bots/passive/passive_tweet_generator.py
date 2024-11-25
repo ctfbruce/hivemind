@@ -58,7 +58,7 @@ def generate_sports_tweet(sport,team_preference):
 
 
 def generate_daily_life_update_tweet(bot):
-    persona_metadata = bot["background"]
+    persona_metadata = bot["basic_metadata"]["background"]
     
     with open("passive/life_update_prompt.txt", "r") as life_update_prompt:
         # Read the template and escape literal braces
@@ -85,7 +85,10 @@ def generate_daily_life_update_tweet(bot):
             if response["life_changing_update"] is not None:
                 print("life chaanged")
                 print(response["life_changing_update"])
-                collection.update_one({"_id":bot["_id"]}, {"$set": {"background": bot["background"] + response["life_changing_update"]}})
+                collection.update_one(
+                    {"_id": bot["_id"]},
+                    {"$set": {"basic_metadata.background": bot["basic_metadata"]["background"] + response["life_changing_update"]}}
+                )
             
             return response["life_update"]
 
@@ -111,23 +114,39 @@ def generate_other(type):
     content_type_prompts = {
         "random_questions":"a random question people would ask their twitter followers randomly, something lighthearted",
         "inspirational_content":"a really inspiring quote or message for their followers",
-        "memes_and_humour":"a really funny joke, or pun. Perhaps even a meme or something the like. Make sure your answer doesn't always start with 'just___' ",
+        "memes_or_humorous_content":"a really funny joke, or pun. Perhaps even a meme or something the like. Make sure your answer doesn't always start with 'just___' ",
         "shower_thoughts_and_opinions":"an intriguing shower thought or thought provoking opinion. Make sure your answers are unique in format too, e.g. don't always start with 'just realised' or 'just thought about'",
         "other_miscellaneous":"a random tweet of your choosing!"
     }
 
-    with open("passive_tweet_template.txt", "r") as prompt_template:
+    with open("passive/passive_tweet_template.txt", "r") as prompt_template:
         prompt = prompt_template.read().format(content_type_prompt = content_type_prompts[type])
 
+    return send_prompt(prompt, "llama3.2:1b")
         
-    print(prompt)
 
-def main(bot_id):
+def main(bot_id, tweet_type):
     bot_id = ObjectId(bot_id)
     bot = collection.find_one({"_id": bot_id})
     
-    for i in range(4):
-        print(generate_daily_life_update_tweet(bot))
+    if tweet_type == "daily_life_updates":
+        result = generate_daily_life_update_tweet(bot)
+        print("output from bot = tweet = ", result)
+        return result
+    if tweet_type == "news_reaction":
+        result = generate_news_reaction(bot["political_weights"])
+        print("output from bot = tweet = ", result)
+        return result
+    if tweet_type == "sports":
+        result =  generate_other("shower_thoughts_and_opinions")
+        print("output from bot = tweet = ", result)
+        return result
+    else:
+        result = generate_other(tweet_type)
+        print("output from bot = tweet = ", result)
+        return result
+  
+    
 
 
 
@@ -150,7 +169,7 @@ random_questions -
 
 inspirational_content -
 
-memes_and_humour -
+memes_or_humorous_content -
 
 other_miscellaneous -
 """

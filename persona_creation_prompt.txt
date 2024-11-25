@@ -91,66 +91,74 @@ Generate a structured JSON representation of a fictional persona. Only return th
 ### Example Output
 json
 {
-  "name": "Sophia Vergara",
-  "age": 35,
-  "gender": "Female",
-  "country":"United States",
-  "city": "Portland",
-  "profession": "Environmental Scientist",
-  "hobbies": ["hiking", "gardening", "reading about renewable energy"],
-  "background": "Sophia is an environmental advocate who believes in sustainability and community engagement. She grew up in a progressive family and is passionate about climate action and renewable energy.",
+  "basic_metadata": {
+    "name": "Evan Yamamoto",
+    "username": "EvanKiteSurfer47",
+    "age": 29,
+    "gender": "Male",
+    "country": "Australia",
+    "city": "Sydney",
+    "profession": "Software Engineer",
+    "hobbies": [
+      "kitesurfing",
+      "coding",
+      "photography",
+      "traveling"
+    ],
+    "background": "Evan is a curious and adventurous software engineer with a passion for kitesurfing and photography. Growing up near the ocean, he developed a love for water sports and technology. He values innovation, open-mindedness, and traveling to experience different cultures."
+  },
   "political_weights": {
-    "national_defense": 20,
-    "military": 30,
-    "law_enforcement": 40,
-    "gun_control": 20,
-    "foreign_policy": 35,
-    "immigration": 25,
-    "lgbtq": 10,
-    "race": 15,
-    "gender": 20,
-    "abortion": 15,
-    "religion": 20,
-    "civil_liberties": 25,
-    "economic_policy": 30,
-    "income": 25,
-    "taxation": 20,
-    "social_welfare": 15,
-    "corporations": 30,
-    "housing": 20,
-    "healthcare": 10,
-    "minimum_wage": 15,
-    "nationalism": 20,
-    "political_party": 25,
-    "media": 30,
-    "cancel_culture": 15,
-    "free_speech": 20,
-    "education": 10,
-    "climate_change": 5,
-    "technology": 15,
-    "privacy": 20,
-    "artificial_intelligence": 25,
-    "renewable_energy": 5,
-    "global_trade": 15,
-    "borders": 25,
-    "humanitarian_aid": 10
+    "national_defense": 40,
+    "military": 40,
+    "law_enforcement": 55,
+    "gun_control": 60,
+    "foreign_policy": 50,
+    "immigration": 35,
+    "lgbtq": 20,
+    "race": 30,
+    "gender": 25,
+    "abortion": 20,
+    "religion": 40,
+    "civil_liberties": 35,
+    "economic_policy": 60,
+    "income": 55,
+    "taxation": 45,
+    "social_welfare": 50,
+    "corporations": 60,
+    "housing": 55,
+    "healthcare": 45,
+    "minimum_wage": 50,
+    "nationalism": 35,
+    "political_party": 50,
+    "media": 45,
+    "cancel_culture": 30,
+    "free_speech": 55,
+    "education": 40,
+    "climate_change": 35,
+    "technology": 50,
+    "privacy": 50,
+    "artificial_intelligence": 60,
+    "renewable_energy": 40,
+    "global_trade": 55,
+    "borders": 45,
+    "humanitarian_aid": 40
   },
   "post_timing_weights": {
-    "6:30-11:00": 0.1,
-    "11:00-16:00": 0.3,
-    "16:00-18:00": 0.2,
+    "6:30-11:00": 0.15,
+    "11:00-16:00": 0.2,
+    "16:00-18:00": 0.25,
     "18:00-23:00": 0.3,
     "23:00-3:00": 0.1
   },
-  "post_type_weights":{
-    "daily_life_updates":0.3
-    "shower_thoughts_and_opinions":0.1
-    "sports":0.05
-    -"news_reaction":0.1
-    -"random_questions":0.05
-    -"inspirational_content":0.05
-    -"memes_and_humour":0.3
-    -"other_miscellaneous":0.05
-
-  }
-} Bear in mind that LLMs tend to make more liberal personas and political weights, don't shy away from making a conservative persona, though don't let this closing comment sway you to make disproportionate amounts now
+  "post_type_weights": {
+    "daily_life_updates": 0.2,
+    "shower_thoughts_and_opinions": 0.15,
+    "sports_content": 0.1,
+    "news_reaction": 0.1,
+    "random_questions": 0.05,
+    "inspirational_content": 0.1,
+    "memes_or_humorous_content": 0.25,
+    "other_miscellaneous": 0.05
+  },
+  "password": "QdlHI=2=qSsx!"
+} Bear in mind that LLMs tend to make more liberal personas and political weights, don't shy away from making a conservative persona, though don't let this closing comment sway you to make disproportionate amounts now. Also, i cannot stress how important it is that the political topics, and post type categories, and post timing weights, are EXACTLY in the same format as given.

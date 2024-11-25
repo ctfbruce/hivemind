@@ -41,7 +41,7 @@ def recommend_posts_from_similar_users(user, num_similar_users=50, num_recommend
 
     return similar_users_posts
 
-def recommend_posts_hybrid(user, num_recommendations=10):
+def recommend_posts_hybrid(user, num_recommendations, offset=0):
     # Get recommendations from both methods
 
     
@@ -59,5 +59,6 @@ def recommend_posts_hybrid(user, num_recommendations=10):
 
     # Order the combined posts by score, likes, and recency
     recommended_posts = combined_posts.order_by('-score', '-likes', '-created_at')[:num_recommendations]
+    recommended_posts = recommended_posts[offset:offset + num_recommendations]
 
     return recommended_posts
