@@ -1,0 +1,67 @@
+I want you to pretend you're this fictitious person. Here is the metadata about this person: {persona_metadata}. Based on this information, generate a life update Twitter post for this person that reflects their personality, daily routine, or recent experiences. The post should feel personal and authentic, including hashtags, emojis, and a casual tone where appropriate.
+
+Occasionally, this person may experience significant or life-changing events. If this happens, the **life_changing_update** must be directly tied to the content of the **life_update**. It should summarize the most impactful part of the update in a concise way, without introducing unrelated information.
+
+### Output Format
+Respond **ONLY** with a JSON object. Use double quotes (`"`) for all keys and string values, as required by JSON. The format should look like this:
+{
+    "life_update": "string",
+    "life_changing_update": "string"
+}
+
+### Guidelines
+- **Life Updates**: These should be descriptive and formatted like tweets. They can include hashtags, emojis, and casual language. The focus is on sharing a story or moment that reflects the persona’s personality, hobbies, or daily activities.
+- **Life-Changing Updates**: These are rare but impactful. They must always summarize the most significant detail of the corresponding **life_update**, ensuring they are logically and contextually linked. Avoid general or unrelated events here.
+  - Examples of life-changing events include: adopting a pet, completing a major personal goal, starting a significant new hobby, or a transformative life milestone.
+  - Avoid updates about profession changes or moving to a new city.
+  - If no life-changing event applies, set "life_changing_update" to `null`.
+
+### Examples
+1. **Regular life update**:
+{
+    "life_update": "Had the best day hiking with friends in the mountains 🏔️. The views were breathtaking, and I even spotted a deer on the trail! #NatureLover",
+    "life_changing_update": null
+}
+
+2. **Significant life event**:
+{
+    "life_update": "I finally got my first tattoo! It’s an intricate design of Icarus falling, symbolizing ambition and resilience. 🖤 #TattooGoals",
+    "life_changing_update": "Got their first tattoo: an Icarus design."
+}
+
+3. **Another significant event**:
+{
+    "life_update": "Baked my first sourdough bread today! It took a few tries to get it right, but the result is so worth it 🍞❤️. My kitchen smells amazing. #BakingAdventures",
+    "life_changing_update": "Baked their first sourdough bread."
+}
+
+### Key Points to Remember:
+- The **life_changing_update** must summarize or highlight the most significant part of the corresponding **life_update**.
+- If the **life_update** does not contain anything significant or transformative, set the **life_changing_update** to `null`.
+- The updates should align with the persona's metadata, such as their background, profession, hobbies, and personality traits.
+- Write the **life_update** in the tone of a tweet, including hashtags, emojis, and a casual style.
+
+### Examples of Poor Responses:
+1. Mismatched updates:
+    {
+        "life_update": "Spent the evening watching my favorite sci-fi movies 🚀.",
+        "life_changing_update": "Adopted a golden retriever."
+    }
+    **Why it's wrong**: The life-changing update is unrelated to the life update.
+
+2. Repetitive updates:
+    {
+        "life_update": "I got my first tattoo! It’s an intricate design of Icarus falling, symbolizing ambition and resilience.",
+        "life_changing_update": "I got my first tattoo."
+    }
+    **Why it's wrong**: The life-changing update simply repeats the life update without distilling the key impactful detail.
+
+3. Unnecessary life-changing update:
+    {
+        "life_update": "Had a relaxing day reading my favorite mystery novel. Perfect way to unwind! 📚",
+        "life_changing_update": "Read a mystery novel."
+    }
+    **Why it's wrong**: The event is not significant enough to warrant a life-changing update.
+
+### Your Task
+Generate one life update and one life-changing update (if applicable) for this person. Ensure they are logically linked, and respond **ONLY** with the JSON object, formatted exactly as shown in the examples.

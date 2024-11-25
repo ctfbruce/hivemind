@@ -189,12 +189,12 @@ def send_prompt(tweet_prompt, model):
     return response.text
 
 # Function to parse and print response
-def print_response(stream_response):
+def return_formatted_response(stream_response):
     try:
         json_response = json.loads(stream_response)
         response = json_response["response"]
         response = response[response.index('"'):response.rindex('"')]
-        print(response)
+        return response
         
         
     except Exception as e:
@@ -229,7 +229,7 @@ def determine_category_with_bart(prompt, topics):
 
 
 # Main function
-def main(prompt,model):
+def political_tweet(prompt, political_weights,model="mistral:latest"):
     
     if model == "llama3.2:1b":
         tweet_prompt_template = llama3_tweet_prompt_template
@@ -237,42 +237,7 @@ def main(prompt,model):
         tweet_prompt_template = mistral_tweet_prompt_template
 
     # Define topic weights
-    weights = {
-    "national_defense": 70,
-    "military": 75,
-    "law_enforcement": 80,
-    "gun_control": 90,
-    "foreign_policy": 60,
-    "immigration": 60,
-    "lgbtq": 40,
-    "race": 50,
-    "gender": 50,
-    "abortion": 80,
-    "religion": 70,
-    "civil_liberties": 60,
-    "economic_policy": 30,
-    "income": 40,
-    "taxation": 50,
-    "social_welfare": 40,
-    "corporations": 70,
-    "housing": 50,
-    "healthcare": 50,
-    "minimum_wage": 40,
-    "nationalism": 80,
-    "political_party": 60,
-    "media": 70,
-    "cancel_culture": 80,
-    "free_speech": 80,
-    "education": 40,
-    "climate_change": 30,
-    "technology": 50,
-    "privacy": 60,
-    "artificial_intelligence": 50,
-    "renewable_energy": 40,
-    "global_trade": 50,
-    "borders": 70,
-    "humanitarian_aid": 40,
-}
+    weights = political_weights
 
 
 
@@ -289,18 +254,12 @@ def main(prompt,model):
                                                             prompt = prompt
                                                             )
     #print("sending to generative model...")
-    print_response(send_prompt(tweet_prompt_formatted, model))
+    return return_formatted_response(send_prompt(tweet_prompt_formatted, model))
     
 
     
     
 
-# Run the main function
-if __name__ == "__main__":
-    prompt = "RFK Jr"
-    model = "llama3.2:1b"
-
-    main(prompt, model)
 
 
 # print(mistral_tweet_prompt_template.format(

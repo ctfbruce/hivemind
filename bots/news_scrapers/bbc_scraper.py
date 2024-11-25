@@ -2,7 +2,15 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup
 
-bbc_us_and_canada_url = "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
+
+rss_feed_urls = {
+"us_and_canada" : "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml",
+"entertainment_and_arts" : "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml",
+"top_stories" : "https://feeds.bbci.co.uk/news/rss.xml",
+"science_and_environment" : "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+"politics":"https://feeds.bbci.co.uk/news/politics/rss.xml",
+"education":"https://feeds.bbci.co.uk/news/education/rss.xml",
+}
 
 def scrape_rss_feed(feed_url = "http://feeds.bbci.co.uk/news/politics/rss.xml" ):
     feed = feedparser.parse(feed_url)
@@ -43,15 +51,17 @@ def scrape_page(url):
     
     return text_blocks, tags
     
-def rss_scrape_to_prompt(feed_url = "http://feeds.bbci.co.uk/news/politics/rss.xml"):
+def rss_scrape_to_prompt(feed_url):
     rss_dict = scrape_rss_feed(feed_url)
     
     return [f"{entry['title']}: {entry['summary']}" for entry in rss_dict]
 
-def main(rss_url=bbc_us_and_canada_url,num_of_articles=3):
+
+def get_stories_from_topic(topic, number_of_headlines):
+    if topic not in rss_feed_urls:
+        raise KeyError(f"topic must be one of: {list(rss_feed_urls.keys())}")
     
-    return rss_scrape_to_prompt(rss_url)[0:num_of_articles]
-    
+    return(rss_scrape_to_prompt(rss_feed_urls[topic])[0:number_of_headlines])
     
     
 
