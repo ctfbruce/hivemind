@@ -1,0 +1,45 @@
+<div id="live-feed-container">
+    <h2>Live Feed</h2>
+    <div id="live-feed">
+        <!-- Content dynamically updated via WebSocket -->
+        <div class="live-feed-item">
+            <p class="post-text">Welcome to the live feed!</p>
+            <span class="post-time">Just now</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize WebSocket connection
+    const socket = new WebSocket('ws://' + window.location.host + '/ws/live_feed/');
+
+    socket.onopen = function () {
+        console.log('WebSocket connection established.');
+    };
+
+    socket.onmessage = function (event) {
+        // Parse the incoming message
+        const data = JSON.parse(event.data);
+
+        // Add the new content to the live feed
+        const feed = document.getElementById('live-feed');
+        const newItem = document.createElement('div');
+        newItem.classList.add('live-feed-item');
+        newItem.innerHTML = `
+            <p class="post-text">${data.content}</p>
+            <span class="post-time">${data.timestamp}</span>
+        `;
+        feed.prepend(newItem); // Add the new item at the top
+
+        // Optional: Scroll to the top to show the new item
+        feed.scrollTop = 0;
+    };
+
+    socket.onclose = function () {
+        console.warn('WebSocket connection closed.');
+    };
+
+    socket.onerror = function (error) {
+        console.error('WebSocket error:', error);
+    };
+</script>

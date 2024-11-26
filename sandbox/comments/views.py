@@ -6,6 +6,7 @@ from .forms import CommentForm
 from .models import Comment
 from posts.models import Post
 from hashtags.utils import extract_hashtags
+from posts.utils import notify_feed
 
 @login_required
 def add_comment(request, post_id):
@@ -20,6 +21,7 @@ def add_comment(request, post_id):
             new_comment.save()
             hashtags = extract_hashtags(new_comment.content)
             new_comment.hashtags.set(hashtags)
+            notify_feed(f"{request.user.user} just commented on {post.author.user}")
             return redirect('home')  # Redirect to the appropriate page
     else:
         form = CommentForm()

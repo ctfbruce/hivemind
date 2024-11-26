@@ -43,6 +43,16 @@
             </ul>
 
             <div class="tab-content" id="feedTabsContent">
+                
+                
+                <!-- Live Feed -->
+                {% include "posts/partials/_live_feed.html" %}
+
+                <link rel="stylesheet" href="{% static 'css/live_feed.css' %}">
+                <script src="{% static 'js/live_feed.js' %}"></script>
+                
+
+
                 <!-- Following Tab Pane -->
                 <div class="tab-pane fade {% if not query %}show active{% endif %}" id="following" role="tabpanel" aria-labelledby="following-tab">
                     {% if following_posts %}
@@ -141,8 +151,8 @@
                         {% endif %}
                     {% else %}
                         <!-- Default Discover Content (same as Trending) -->
-                        {% if trending_posts %}
-                            {% for post in trending_posts %}
+                        {% if random_posts %}
+                            {% for post in random_posts %}
                                 {% include 'posts/partials/post_card.html' with post=post %}
                             {% endfor %}
                         {% else %}

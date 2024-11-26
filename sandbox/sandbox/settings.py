@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     "timeline",
     "hashtags",
     "django.contrib.humanize",
+    'channels',
+
 ]
 
 MIDDLEWARE = [
@@ -62,7 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Global templates directory
-        'APP_DIRS': True,  # Enables app-level templates
+        'APP_DIRS': True,  
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -75,8 +77,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sandbox.wsgi.application'
+ASGI_APPLICATION = 'sandbox.asgi.application'
 
-
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
