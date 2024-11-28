@@ -49,7 +49,12 @@ def send_like_to_random_post(host, username, password):
         tab_id = "discover" if random.random() < 0.7 else "trending"
         tab_content = soup.find("div", {"id": tab_id})
         if not tab_content:
-            raise Exception(f"Tab '{tab_id}' not found on the page.")
+            print("used credentials", username, password)
+            print("attempting to register again . . .")
+            from bots.site_interactions import register_user
+            register_user(username, username+"@gmail.com", password)
+
+            raise Exception(f"Tab '{tab_id}' not found on the page. Could not like")
 
         # Find posts in the selected tab
         posts = tab_content.find_all("div", class_="card mb-3")
