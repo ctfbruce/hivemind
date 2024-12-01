@@ -27,4 +27,5 @@ class PostForm(forms.ModelForm):
         content = bleach.clean(content, tags=allowed_tags, attributes=allowed_attributes, strip=True)
         # Decode HTML entities
         content = html.unescape(content)
+        
         return content

@@ -1,5 +1,5 @@
-<!-- users/templates/users/login.html -->
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-5">
@@ -25,4 +25,28 @@
         </div>
     </div>
 </div>
+<!-- Include reCAPTCHA API -->
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    grecaptcha.ready(function() {
+        console.log("passed checkpoint 1");
+        grecaptcha.execute(JSON.parse(document.getElementById('recaptcha_site_key').textContent), {action: 'login'}).then(function(token) {
+            console.log("passed checkpoint 2");
+
+            const tokenField = document.getElementById('id_recaptcha_token');
+            if (tokenField) {
+                tokenField.value = token;
+                console.log('Token assigned successfully.');
+            } else {
+                console.error('Hidden input field not found!');
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}

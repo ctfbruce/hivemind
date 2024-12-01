@@ -8,6 +8,8 @@ from bots.passive.bot_actions.tweet import tweet
 from bots.passive.bot_actions.comment import fetch_comment_to_reply_to_and_comment
 from bots.passive.bot_actions.like import send_like_to_random_post
 import pandas as pd
+from bots.passive.bot_actions.temp_recaptcha_click_and_type_async import main as re_captcha_action
+
 
 # MongoDB Configuration
 MONGO_URI = "mongodb://localhost:27017/"
@@ -66,12 +68,37 @@ async def process_interaction():
                     username = bot["basic_metadata"]["username"]
                     password = bot["password"]
 
+                #main("comment","theom","theom","is a tree lover", headless=False)
+                #main("post", "theom", "theom", 3, "political", headless=False)
+                #main("like", "theom", "theom", 3, headless=False)
                     if interaction_type == "like":
-                        send_like_to_random_post(HOST, username, password)
+                        await re_captcha_action(
+                            "like",
+                            username,
+                            password,
+                        )
                     elif interaction_type == "comment":
-                        fetch_comment_to_reply_to_and_comment(HOST, username, password, bot["basic_metadata"]["background"])
+                        await re_captcha_action(
+                            "comment",
+                            username,
+                            password,
+                            persona_metadata = bot["basic_metadata"]["background"]
+                        )
                     else:
-                        tweet(interaction_type, now, name, bot_id, username, password)
+                        await re_captcha_action(
+                            "post",
+                            username,
+                            password,
+                            bot_id=bot_id,
+                            tweet_type = interaction_type
+                        )
+
+                    # if interaction_type == "like":
+                    #     send_like_to_random_post(HOST, username, password)
+                    # elif interaction_type == "comment":
+                    #     fetch_comment_to_reply_to_and_comment(HOST, username, password, bot["basic_metadata"]["background"])
+                    # else:
+                    #     tweet(interaction_type, now, name, bot_id, username, password)
             except Exception as e:
                 print(f"{now} - Error processing interaction: {e}")
                 # Wait and try again

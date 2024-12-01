@@ -4,14 +4,14 @@
         <!-- Content dynamically updated via WebSocket -->
         <div class="live-feed-item">
             <p class="post-text">Welcome to the live feed!</p>
-            <span class="post-time">Just now</span>
+
         </div>
     </div>
 </div>
 
 <script>
     // Initialize WebSocket connection
-    const socket = new WebSocket('ws://' + window.location.host + '/ws/live_feed/');
+    const socket = new WebSocket('ws://127.0.0.1:8000/ws/live_feed/');
 
     socket.onopen = function () {
         console.log('WebSocket connection established.');

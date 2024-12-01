@@ -5,6 +5,31 @@ from django.contrib import messages
 from .forms import UserRegisterForm, UserLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import User
+import requests
+from django.conf import settings
+from django.http import HttpResponse
+
+
+def evaluate_recaptcha(form):
+    recaptcha_token = form.cleaned_data.get('recaptcha_token')
+            # Verify reCAPTCHA token
+    recaptcha_response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_token
+                })
+    result = recaptcha_response.json()
+
+    if not (result.get('success') or result.get('score', 0) < 0.5):
+        
+        print("recaptcha failed", result)
+        
+        return False
+    
+    print(f"user is legitimate, score of {result.get('score')}")
+    return True
+
 
 def register_view(request):
     """Handle user registration."""
@@ -28,6 +53,11 @@ def login_view(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
+            
+            if not(evaluate_recaptcha(form)):
+                print("bot detected . . .")
+                return HttpResponse("Bot detected. . .")
+            
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
@@ -39,7 +69,8 @@ def login_view(request):
                 messages.error(request, "Invalid username or password.")
     else:
         form = UserLoginForm()
-    return render(request, 'users/login.html', {'form': form})
+
+    return render(request, 'users/login.html', {'form': form, 'recaptcha_site_key': settings.RECAPTCHA_SITE_KEY,})
 
 @login_required
 def logout_view(request):

@@ -38,7 +38,7 @@ def get_trending_posts(limit=10, offset=0, like_weight=1, comment_weight=2):
 
 def notify_feed(content):
     
-    timestamp = now().strftime('%Y-%m-%d %H:%M:%S')
+    timestamp = now().strftime('%H:%M:%S')
     # Send the update to WebSocket clients
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(

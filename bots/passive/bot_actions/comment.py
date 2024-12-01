@@ -18,7 +18,7 @@ def extract_csrf_token(session, url):
     if not token:
         raise Exception("CSRF token not found on the page.")
     return token["value"]
-
+import re
 
 def fetch_comment_to_reply_to_and_comment(host, username, password, persona_metadata):
     """
@@ -85,6 +85,43 @@ def fetch_comment_to_reply_to_and_comment(host, username, password, persona_meta
             print(f"Comment posted successfully on post ID {post_id}.")
         else:
             raise Exception(f"Failed to post comment. Status Code: {comment_response.text}")
+
+
+def re_captcha_comment(page, tab):
+    
+    #need to add the functionality to choose which tab to use
+
+    if tab == "discover": tab_id = "[aria-labelledby=discover-tab]> div"
+    elif tab == "trending": tab_id = "[aria-labelledby=trending-tab] > div > div"
+    
+    posts = page.query_selector_all(tab_id)
+
+
+    post_count = len(posts)
+
+    if post_count == 0:
+        raise Exception(f"No posts found under the tab.")
+
+    # Randomly select a post
+    selected_index = random.randint(0, post_count - 1)
+    selected_post = posts[selected_index]
+
+    # Get the <p> tag content within the selected post
+    paragraph = selected_post.query_selector("div > p")  # Adjust the selector if needed
+    form = selected_post.query_selector_all("form")[1]
+    post_id = form.get_attribute("action")
+    post_id = re.search(r'/comments/add/(\d+)/', post_id).group(1)
+
+    if paragraph and post_id:
+        post_content = paragraph.text_content()
+        print("Selected post content:", post_content, " on id ", post_id)
+    else:
+        print("Either <p> or id not found")
+        
+    
+    
+    return {"post_id":int(post_id), "post_content":post_content}
+
 
 # from pymongo import MongoClient
 # from bson.objectid import ObjectId

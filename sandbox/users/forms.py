@@ -17,4 +17,7 @@ class UserRegisterForm(UserCreationForm):
 class UserLoginForm(forms.Form):
     """Form for logging in existing users."""
     username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(widget=forms.PasswordInput, initial="test, remove this, this is to test recaptcha")
+
+
+    recaptcha_token = forms.CharField(widget=forms.HiddenInput, required=False)

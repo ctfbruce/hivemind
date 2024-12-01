@@ -7,6 +7,8 @@ from .models import Comment
 from posts.models import Post
 from hashtags.utils import extract_hashtags
 from posts.utils import notify_feed
+from users.views import evaluate_recaptcha
+from django.http import HttpResponse
 
 @login_required
 def add_comment(request, post_id):
@@ -15,14 +17,18 @@ def add_comment(request, post_id):
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
+            
+            if not(evaluate_recaptcha(form)):
+                return HttpResponse("bot detected . . .")
+            
             new_comment = form.save(commit=False)
             new_comment.author = request.user
             new_comment.post = post
             new_comment.save()
             hashtags = extract_hashtags(new_comment.content)
             new_comment.hashtags.set(hashtags)
-            notify_feed(f"{request.user.user} just commented on {post.author.user}")
+            notify_feed(f"{request.user.username} just commented on {post.author.username}'s post")
             return redirect('home')  # Redirect to the appropriate page
     else:
         form = CommentForm()
-    return render(request, 'comments/add_comment.html', {'form': form, 'post': post})
+    return redirect("home")

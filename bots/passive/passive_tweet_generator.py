@@ -32,26 +32,44 @@ def send_prompt(tweet_prompt, model):
         "max_tokens": 100,
     }
     headers = {"Content-Type": "application/json"}
+    
+    print("sending following to llama", data)
     response = requests.post(ollama_api, data=json.dumps(data), headers=headers).text
-    json_response = json.loads(response)
-    return parse_model_response(json_response["response"])
+    
+    print("response was", response)
+    
+    try:
+        json_response = json.loads(response)
+        print("json response is", json_response)
+        return parse_model_response(json_response['response'])
+    except Exception as e:
+        print(e)
+        return response
+    
 
 def parse_model_response(response_text):
     try:
         # Ensure consistent JSON parsing
         response_text = response_text.strip()
         
+        print("post response is:", response_text)
+        
         # Fix single quotes to double quotes for valid JSON
         if response_text.startswith("'") or response_text.startswith("{'"):
             response_text = response_text.replace("'", '"')
         
+        print("after fixing quotes:", response_text)
+        
         # Parse the JSON response
         parsed_response = json.loads(response_text)
+        
+        print("parsed response is:", parsed_response)
         
         return parsed_response
     except json.JSONDecodeError as e:
         print(f"Invalid JSON: {response_text}")
-        raise e
+        return response_text
+
     
     
 def generate_sports_tweet(sport,team_preference):
@@ -76,6 +94,7 @@ def generate_daily_life_update_tweet(bot):
 
         # Format the template with the persona metadata
         try:
+            
             formatted_prompt = template.format(persona_metadata=persona_metadata)
 
 
@@ -122,6 +141,7 @@ def generate_other(type):
 
     with open("passive/passive_tweet_template.txt", "r") as prompt_template:
         prompt = prompt_template.read().format(content_type_prompt = content_type_prompts[type])
+        print("prompt being sent is", prompt, "and is of type ", type, "being put in ", prompt_template.read())
 
     return send_prompt(prompt, "llama3.2:1b")
         

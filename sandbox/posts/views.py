@@ -16,6 +16,8 @@ from hashtags.utils import extract_hashtags
 from .recommendations import recommend_posts_hybrid
 from .utils import get_trending_posts, notify_feed
 import random
+from users.views import evaluate_recaptcha
+from django.conf import settings
 
 @login_required
 def home_view(request):
@@ -95,6 +97,7 @@ def home_view(request):
         'recommended_posts': recommended_posts,
         'page': 1,
         'posts_per_page': 10,
+        'recaptcha_site_key': settings.RECAPTCHA_SITE_KEY,
     }
     return render(request, 'home.html', context)
 
@@ -104,6 +107,8 @@ def post_tweet(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
+            if not(evaluate_recaptcha(form)):
+                return HttpResponse("bot detected . . .")
             new_post = form.save(commit=False)
             new_post.author = request.user
             new_post.save()
@@ -134,7 +139,7 @@ def like_post(request, post_id):
             # Add a like to the post
             post.likes.add(user)
             
-            notify_feed(f"{user.user} liked a post <3")
+            notify_feed(f"{user.username} liked a post <3")
             
     
     
